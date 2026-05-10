@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TravelLoop Planner</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(to right,#4facfe,#00f2fe);
+}
+
+.container{
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:white;
+    margin-bottom:30px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+.card h2{
+    margin-top:0;
+    color:#333;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+button{
+    background:#007bff;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+#output{
+    line-height:1.8;
+}
+
+.stop-box{
+    background:#f4f4f4;
+    padding:12px;
+    margin-top:10px;
+    border-radius:5px;
+}
+
+.total-box{
+    background:#d4edda;
+    padding:10px;
+    margin-top:10px;
+    border-radius:5px;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌍 TravelLoop Planner</h1>
+
+    <!-- CREATE TRIP -->
+    <div class="card">
+
+        <h2>Create Trip</h2>
+
+        <input type="text" id="tripName" placeholder="Enter Trip Name">
+
+        <input type="date" id="startDate">
+
+        <input type="date" id="endDate">
+
+    </div>
+
+    <!-- ADD STOP -->
+    <div class="card">
+
+        <h2>Add Stop</h2>
+
+        <input type="text" id="cityName" placeholder="City Name">
+
+        <input type="number" id="days" placeholder="Number of Days">
+
+        <input type="text" id="hotelName" placeholder="Hotel Name">
+
+        <button onclick="addStop()">Add Stop</button>
+
+    </div>
+
+    <!-- ADD BUDGET -->
+    <div class="card">
+
+        <h2>Add Budget</h2>
+
+        <input type="text" id="budgetCategory" placeholder="Budget Category">
+
+        <input type="number" id="budgetAmount" placeholder="Amount">
+
+        <button onclick="addBudget()">Add Budget</button>
+
+    </div>
+
+    <!-- PACKING -->
+    <div class="card">
+
+        <h2>Packing List</h2>
+
+        <input type="text" id="packingItem" placeholder="Packing Item">
+
+        <button onclick="addPacking()">Add Item</button>
+
+    </div>
+
+    <!-- NOTES -->
+    <div class="card">
+
+        <h2>Notes</h2>
+
+        <input type="text" id="noteText" placeholder="Enter Note">
+
+        <button onclick="addNote()">Add Note</button>
+
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="card">
+
+        <h2>Trip Summary</h2>
+
+        <div id="output">
+
+            <p>No trip details added yet.</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let stops = [];
+let budgets = [];
+let packingItems = [];
+let notes = [];
+
+function addStop(){
+
+    let city = document.getElementById("cityName").value;
+    let days = document.getElementById("days").value;
+    let hotel = document.getElementById("hotelName").value;
+
+    if(city === "" || days === "" || hotel === ""){
+        alert("Please fill all stop details");
+        return;
+    }
+
+    stops.push({
+        city:city,
+        days:days,
+        hotel:hotel
+    });
+
+    document.getElementById("cityName").value = "";
+    document.getElementById("days").value = "";
+    document.getElementById("hotelName").value = "";
+
+    displayData();
+}
+
+function addBudget(){
+
+    let category = document.getElementById("budgetCategory").value;
+    let amount = document.getElementById("budgetAmount").value;
+
+    if(category === "" || amount === ""){
+        alert("Please enter budget details");
+        return;
+    }
+
+    budgets.push({
+        category:category,
+        amount:Number(amount)
+    });
+
+    document.getElementById("budgetCategory").value = "";
+    document.getElementById("budgetAmount").value = "";
+
+    displayData();
+}
+
+function addPacking(){
+
+    let item = document.getElementById("packingItem").value;
+
+    if(item === ""){
+        alert("Please enter packing item");
+        return;
+    }
+
+    packingItems.push(item);
+
+    document.getElementById("packingItem").value = "";
+
+    displayData();
+}
+
+function addNote(){
+
+    let note = document.getElementById("noteText").value;
+
+    if(note === ""){
+        alert("Please enter note");
+        return;
+    }
+
+    notes.push(note);
+
+    document.getElementById("noteText").value = "";
+
+    displayData();
+}
+
+function displayData(){
+
+    let tripName = document.getElementById("tripName").value;
+    let startDate = document.getElementById("startDate").value;
+    let endDate = document.getElementById("endDate").value;
+
+    let output = "";
+
+    output += `
+        <h2>${tripName}</h2>
+        <p><b>Travel Dates:</b> ${startDate} to ${endDate}</p>
+    `;
+
+    output += `<h3>📍 Stops</h3>`;
+
+    if(stops.length === 0){
+        output += `<p>No stops added.</p>`;
+    }
+
+    stops.forEach(stop => {
+
+        output += `
+            <div class="stop-box">
+
+                <b>City:</b> ${stop.city}<br>
+
+                <b>Days:</b> ${stop.days}<br>
+
+                <b>Hotel:</b> ${stop.hotel}
+
+            </div>
+        `;
+    });
+
+    output += `<h3>💰 Budget</h3>`;
+
+    let total = 0;
+
+    if(budgets.length === 0){
+        output += `<p>No budget added.</p>`;
+    }
+
+    budgets.forEach(budget => {
+
+        output += `
+            ${budget.category}: ₹${budget.amount}<br>
+        `;
+
+        total += budget.amount;
+    });
+
+    output += `
+        <div class="total-box">
+            Total Budget: ₹${total}
+        </div>
+    `;
+
+    output += `<h3>🎒 Packing List</h3>`;
+
+    if(packingItems.length === 0){
+        output += `<p>No packing items added.</p>`;
+    }
+
+    packingItems.forEach(item => {
+
+        output += `
+            ✔ ${item}<br>
+        `;
+    });
+
+    output += `<h3>📝 Notes</h3>`;
+
+    if(notes.length === 0){
+        output += `<p>No notes added.</p>`;
+    }
+
+    notes.forEach(note => {
+
+        output += `
+            • ${note}<br>
+        `;
+    });
+
+    document.getElementById("output").innerHTML = output;
+}
+
+</script>
+
+</body>
+</html>
